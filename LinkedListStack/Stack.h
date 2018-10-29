@@ -1,4 +1,6 @@
 #pragma once
+#include <iterator>
+#include <iostream>
 
 class Stack
 {
@@ -24,6 +26,17 @@ private:
 		int GetVal() const
 		{
 			return val;
+		}
+		int& GetValRef()
+		{
+			return val;
+		}
+		Element* GetNext() const
+		{
+			if (pNext != nullptr)
+			{
+				return pNext;
+			}
 		}
 		Element* Disconnect()
 		{
@@ -52,6 +65,32 @@ private:
 		Element* pNext = nullptr;
 	};
 public:
+	class ElementIterator : std::iterator<std::forward_iterator_tag, Element>
+	{
+	public:
+		// Constructors and copy operator
+		ElementIterator(pointer p) : ptr(p) {}
+		ElementIterator(reference p) : ptr(&p) {}
+		ElementIterator(ElementIterator* source) : ptr(source->ptr) {}
+		ElementIterator& operator=(const ElementIterator& src) { ptr = src.ptr; return *this; }
+
+		// Increment operators
+		ElementIterator& operator++() { ptr = ptr->GetNext(); return *this; }
+		ElementIterator& operator++(int) { ElementIterator copy(this); ptr = ptr->GetNext(); return copy; };
+
+		// Comparison Operators
+		bool operator==(const ElementIterator& rhs) { return ptr == rhs.ptr; };
+		bool operator!=(const ElementIterator& rhs) { return ptr != rhs.ptr; };
+
+		// Dereference Operators
+		int& operator*() { return ptr->GetValRef(); };
+		int& operator->() { return ptr->GetValRef(); };
+
+	protected:
+		pointer ptr;
+	};
+
+	
 	Stack() = default;
 	Stack( const Stack& src )
 	{
@@ -109,10 +148,22 @@ public:
 			return 0;
 		}
 	}
+
+	int Peek()
+	{
+		return pTop->GetVal();
+	}
 	bool Empty() const
 	{
 		return pTop == nullptr;
 	}
+
+	friend std::ostream& operator<< (std::ostream&out, Stack &s);
+
+	// Iterator methods
+	ElementIterator& begin() { return ElementIterator(pTop); };
+	ElementIterator& end() { return ElementIterator(pTop + pTop->CountElements()); };
 private:
 	Element* pTop = nullptr;
 };
+
