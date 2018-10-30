@@ -37,6 +37,7 @@ private:
 			{
 				return pNext;
 			}
+			else return nullptr;
 		}
 		Element* Disconnect()
 		{
@@ -55,6 +56,7 @@ private:
 				return 1;
 			}
 		}
+
 		~Element()
 		{
 			delete pNext;
@@ -90,6 +92,29 @@ public:
 		pointer ptr;
 	};
 
+	class ElementIteratorConst : std::iterator<std::forward_iterator_tag, Element>
+	{
+	public:
+		// Constructors and copy operator
+		ElementIteratorConst(pointer p) : ptr(p) {}
+		ElementIteratorConst(reference p) : ptr(&p) {}
+		ElementIteratorConst(ElementIteratorConst* source) : ptr(source->ptr) {}
+		ElementIteratorConst& operator=(const ElementIteratorConst& src) { ptr = src.ptr; return *this; }
+
+		// Increment operators
+		ElementIteratorConst& operator++() { ptr = ptr->GetNext(); return *this; }
+		ElementIteratorConst& operator++(int){ ElementIteratorConst copy(this); ptr = ptr->GetNext(); return copy; };
+
+		// Comparison Operators
+		bool operator==(const ElementIteratorConst& rhs) const { return ptr == rhs.ptr; };
+		bool operator!=(const ElementIteratorConst& rhs) const { return ptr != rhs.ptr; };
+
+		// Dereference Operators
+		const int& operator*() const { return ptr->GetValRef(); };
+		const int& operator->() const { return ptr->GetValRef(); };
+	protected:
+		pointer ptr;
+	};
 	
 	Stack() = default;
 	Stack( const Stack& src )
@@ -158,11 +183,35 @@ public:
 		return pTop == nullptr;
 	}
 
+	Element* GetEnd()
+	{
+		Element *end = pTop;
+		while (end->GetNext() != nullptr)
+		{
+			end = end->GetNext();
+		}
+		end = end->GetNext();
+		return end;
+	}
+
+	Element* GetEnd() const
+	{
+		Element *end = pTop;
+		while (end->GetNext() != nullptr)
+		{
+			end = end->GetNext();
+		}
+		end = end->GetNext();
+		return end;
+	}
 	friend std::ostream& operator<< (std::ostream&out, Stack &s);
 
 	// Iterator methods
 	ElementIterator& begin() { return ElementIterator(pTop); };
-	ElementIterator& end() { return ElementIterator(pTop + pTop->CountElements()); };
+	ElementIterator& end() { return ElementIterator( GetEnd() ); };
+	ElementIteratorConst& begin() const { return ElementIteratorConst(pTop); };
+	ElementIteratorConst& end() const { return ElementIteratorConst(GetEnd()); }
+
 private:
 	Element* pTop = nullptr;
 };
