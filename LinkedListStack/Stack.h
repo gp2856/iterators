@@ -71,7 +71,7 @@ public:
 	{
 	public:
 		// Constructors and copy operator
-		ElementIterator(pointer p) : ptr(p) {}
+		ElementIterator(pointer p = nullptr) : ptr(p) {}
 		ElementIterator(reference p) : ptr(&p) {}
 		ElementIterator(ElementIterator* source) : ptr(source->ptr) {}
 		ElementIterator& operator=(const ElementIterator& src) { ptr = src.ptr; return *this; }
@@ -96,7 +96,7 @@ public:
 	{
 	public:
 		// Constructors and copy operator
-		ElementIteratorConst(pointer p) : ptr(p) {}
+		ElementIteratorConst(pointer p = nullptr) : ptr(p) {}
 		ElementIteratorConst(reference p) : ptr(&p) {}
 		ElementIteratorConst(ElementIteratorConst* source) : ptr(source->ptr) {}
 		ElementIteratorConst& operator=(const ElementIteratorConst& src) { ptr = src.ptr; return *this; }
@@ -183,34 +183,12 @@ public:
 		return pTop == nullptr;
 	}
 
-	Element* GetEnd()
-	{
-		Element *end = pTop;
-		while (end->GetNext() != nullptr)
-		{
-			end = end->GetNext();
-		}
-		end = end->GetNext();
-		return end;
-	}
-
-	Element* GetEnd() const
-	{
-		Element *end = pTop;
-		while (end->GetNext() != nullptr)
-		{
-			end = end->GetNext();
-		}
-		end = end->GetNext();
-		return end;
-	}
-	friend std::ostream& operator<< (std::ostream&out, Stack &s);
 
 	// Iterator methods
-	ElementIterator& begin() { return ElementIterator(pTop); };
-	ElementIterator& end() { return ElementIterator( GetEnd() ); };
-	ElementIteratorConst& begin() const { return ElementIteratorConst(pTop); };
-	ElementIteratorConst& end() const { return ElementIteratorConst(GetEnd()); }
+	ElementIterator& begin() { return ElementIterator{ pTop }; };
+	ElementIterator& end() { return ElementIterator{}; };
+	ElementIteratorConst& begin() const { return ElementIteratorConst{ pTop }; };
+	ElementIteratorConst& end() const { return ElementIteratorConst{}; }
 
 private:
 	Element* pTop = nullptr;
